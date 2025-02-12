@@ -1,0 +1,58 @@
+def resize_and_crop(image_path, target_size):
+    # Abre la imagen
+    img = Image.open(image_path)
+    
+    # Calcula la relación de aspecto
+    img_ratio = img.width / img.height
+    target_ratio = target_size[0] / target_size[1]
+
+    # Redimensiona la imagen manteniendo la proporción
+    if img_ratio > target_ratio:
+        # La imagen es más ancha que el objetivo
+        new_height = target_size[1]
+        new_width = int(new_height * img_ratio)
+    else:
+        # La imagen es más alta que el objetivo
+        new_width = target_size[0]
+        new_height = int(new_width / img_ratio)
+
+    # Redimensiona la imagen
+    img = img.resize((new_width, new_height), Image.LANCZOS)
+
+    # Recorta la imagen al tamaño objetivo
+    left = (new_width - target_size[0]) / 2
+    top = (new_height - target_size[1]) / 2
+    right = (new_width + target_size[0]) / 2
+    bottom = (new_height + target_size[1]) / 2
+
+    img = img.crop((left, top, right, bottom))
+
+    return img
+
+def generate_image(background_path, imagen_path, logo_path, copy_text, copy_position, image_position, logo_position, legal_text, legal_position, button_path, button_position, output_resolution, output_path):
+    ancho, alto = map(int, output_resolution.split('x'))
+
+    # Cargar y redimensionar el fondo
+    background = Image.open(background_path).resize((ancho, alto)).convert("RGBA")
+
+    # Procesar imagen principal
+    imagen = resize_and_crop(imagen_path, (int(ancho * image_position[2]), int(alto * image_position[3])))
+    imagen = imagen.convert("RGBA")  # Asegúrate de que la imagen tenga un canal alfa
+    imagen_x, imagen_y = int(ancho * image_position[0]), int(alto * image_position[1])
+    background.paste(imagen, (imagen_x, imagen_y), imagen)
+
+    # Procesar logo
+    logo = resize_and_crop(logo_path, (int(ancho * logo_position[2]), int(alto * logo_position[3])))
+    logo = logo.convert("RGBA")  # Asegúrate de que la imagen tenga un canal alfa
+    logo_x, logo_y = int(ancho * logo_position[0]), int(alto * logo_position[1])
+    background.paste(logo, (logo_x, logo_y), logo)
+
+    # Procesar botón -> es la imagen 2
+    button = resize_and_crop(button_path, (int(ancho * button_position[2]), int(alto * button_position[3])))
+    button = button.convert("RGBA")  # Asegúrate de que la imagen tenga un canal alfa
+    button_x, button_y = int(ancho * button_position[0]), int(alto * button_position[1])
+    background.paste(button, (button_x, button_y), button)
+
+    # Resto del código para dibujar el texto y guardar la imagen...
+    background.save(output_path)
+    print(f"Imagen guardada en {output_path}")

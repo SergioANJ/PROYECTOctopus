@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dibujo de Rectángulos</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Enlazamos el archivo CSS -->
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Selecciona primero el tipo de imagen a dibujar</h1>
+    <button class="button" id="btn1">Imagen 1</button>
+    <button class="button" id="btn2">Imagen 2</button>
+    <button class="button" id="btn3">Título</button>
+    <button class="button" id="btn4">Legal</button>
+    <button class="button" id="btn5">Logo</button>
+    <button class="button" id="saveButton">Guardar Coordenadas</button>
+    <button class="button" id="descargar">Descargar Coordenadas</button>
+    <canvas id="canvas" width="1080" height="608"></canvas>
+    <div id="coordinates"></div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+canvas {
+    border: 1px solid rgb(241, 9, 9);
+}
+
+body {
+    font-family: Arial, sans-serif; /* Establecer una fuente básica */
+}
+
+.button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(57, 140, 248); /* Color original */
+    transition: background-color 0.3s; /* Transición suave */
+    position: relative; /* Necesario para el efecto de animación */
+    overflow: hidden; /* Para ocultar el contenido que se sale */
+}
+
+.button span {
+    display: inline-block;
+    transition: transform 0.3s;
+}
+
+.button.in span {
+    transform: translateY(-10px); /* Efecto de movimiento hacia arriba */
+}
+
+.button.out span {
+    transform: translateY(10px); /* Efecto de movimiento hacia abajo */
+}
+
+#coordinates {
+    position: absolute; /* Posicionamiento absoluto */
+    top: 300px; /* Distancia desde la parte superior */
+    right: 20px; /* Distancia desde la parte derecha */
+    padding: 10px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde */
+    border-radius: 5px; /* Bordes redondeados */
+    background-color: #f9f9f9; /* Color de fondo */
+    max-width: 340px; /* Ancho máximo */
+}
+#coordinates div {
+    margin: 5px 0; /* Espaciado entre las coordenadas */
+    padding: 5px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde */
+    border-radius: 3px; /* Bordes redondeados */
+}
+

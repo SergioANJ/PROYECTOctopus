@@ -1,0 +1,11 @@
+id_plantilla,id_back,id_imagen_1,id_imagen_2,id_copy,id_legal,id_logo,id_mensaje,id_canal,formato,id_oferta,AUDIENCIA,id_var
+9,3,4,2,4,1,5,1,4,imagen,1,NAVIDEÑOS,A
+10,1,2,3,4,1,1,2,4,imagen,1,NAVIDEÑOS,A
+9,2,3,3,3,1,3,3,4,imagen,1,NAVIDEÑOS,A
+11,1,5,1,4,1,5,4,4,imagen,1,NAVIDEÑOS,A
+11,3,4,4,4,1,2,5,4,imagen,1,DEPORTIVOS ESPN,A
+10,2,3,1,4,1,1,6,4,imagen,1,DEPORTIVOS ESPN,A
+11,1,5,4,3,1,1,7,4,imagen,1,DEPORTIVOS ESPN,A
+9,1,3,2,1,1,1,8,4,imagen,1,DEPORTIVOS ESPN,A
+10,2,4,3,3,1,1,9,4,imagen,1, DOCUMENTALES DE COMIDA - EL OSO,A
+10,2,1,3,1,1,4,10,4,imagen,1, DOCUMENTALES DE COMIDA - EL OSO,A

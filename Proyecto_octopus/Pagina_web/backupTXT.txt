@@ -1,0 +1,366 @@
+--------------------------------HTML---------------------------
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dibujo de Rectángulos</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Enlazamos el archivo CSS -->
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Selecciona primero el tipo de imagen a dibujar</h1>
+    <button id="btn1">Imagen 1</button>
+    <button id="btn2">Imagen 2</button>
+    <button id="btn3">Título</button>
+    <button id="btn4">Legal</button>
+    <button id="btn5">Logo</button>
+    <button id="saveButton">Guardar Coordenadas</button>
+    <button id="descargar">Descargar Coordenadas</button>
+    <canvas id="canvas" width="1080" height="608"></canvas>
+    <div id="coordinates"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+/
+-------------------------------JAVA---------------------------
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const rectangles = []; // Array para almacenar las coordenadas de los rectángulos
+const canvasWidth = canvas.width; // Ancho del canvas
+const canvasHeight = canvas.height;
+let startX, startY, isDrawing = false;
+let currentType = ''; // Tipo de rectángulo a dibujar
+
+// Evento para seleccionar el tipo de rectángulo
+document.getElementById('btn1').addEventListener('click', () => { currentType = 'Imagen 1'; });
+document.getElementById('btn2').addEventListener('click', () => { currentType = 'Imagen 2'; });
+document.getElementById('btn3').addEventListener('click', () => { currentType = 'Titulo'; });
+document.getElementById('btn4').addEventListener('click', () => { currentType = 'Legal'; });
+document.getElementById('btn5').addEventListener('click', () => { currentType = 'Logo'; });
+
+// Evento para iniciar el dibujo
+canvas.addEventListener('mousedown', (event) => {
+    if (currentType) { // Solo dibujar si se ha seleccionado un tipo
+        startX = event.offsetX; // Coordenada X inicial
+        startY = event.offsetY; // Coordenada Y inicial
+        isDrawing = true; // Cambia el estado a "dibujando"
+    }
+});
+
+// Evento para dibujar en el canvas
+canvas.addEventListener('mousemove', (event) => {
+    if (isDrawing) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+        // Redibujar todos los rectángulos existentes
+        rectangles.forEach(rect => {
+            ctx.strokeRect(rect.x * canvasWidth, rect.y * canvasHeight, rect.width * canvasWidth, rect.height * canvasHeight);
+        });
+        const width = event.offsetX - startX; // Calcular el ancho del rectángulo
+        const height = event.offsetY - startY; // Calcular la altura del rectángulo
+        ctx.strokeRect(startX, startY, width, height); // Dibujar el rectángulo actual
+    }
+});
+
+// Evento para finalizar el dibujo
+canvas.addEventListener('mouseup', (event) => {
+    if (isDrawing) {
+        const width = event.offsetX - startX; // Calcular el ancho final
+        const height = event.offsetY - startY; // Calcular la altura final
+        // Almacenar las coordenadas normalizadas en el array
+        rectangles.push({ 
+            x: startX / canvasWidth, 
+            y: startY / canvasHeight, 
+            width: width / canvasWidth, 
+            height: height / canvasHeight,
+            type: currentType // Guardar el tipo de rectángulo
+        });
+        isDrawing = false; // Cambiar el estado a "no dibujando"
+    }
+});
+
+// Función para mostrar las coordenadas en el div
+function displayCoordinates(rect) {
+    const coordinatesDiv = document.getElementById('coordinates');
+    const coordText = `Tipo: ${rect.type}, X: ${rect.x.toFixed(3)}, Y: ${rect.y.toFixed(3)}, Width: ${rect.width.toFixed(3)}, Height: ${rect.height.toFixed(3)}`; // Usar comillas invertidas
+    const coordElement = document.createElement('div');
+    coordElement.textContent = coordText; // Establecer el texto del nuevo div
+    coordinatesDiv.appendChild(coordElement); // Agregar el nuevo div al contenedor de coordenadas
+}
+// Evento para descargar las coordenadas
+document.getElementById('descargar').addEventListener('click', () => {
+    if (rectangles.length === 0) {
+        alert('No hay coordenadas para descargar.');
+        return;
+    }
+
+    // Convertir las coordenadas a JSON
+    const jsonCoordenadas = JSON.stringify(rectangles, null, 2); // Formato legible
+
+    // Crear un Blob y un enlace para descargar
+    const blob = new Blob([jsonCoordenadas], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'coordenadas.json'; // Nombre del archivo
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url); // Liberar el objeto URL
+});
+
+-----------------------CSS---------------------
+canvas {
+    border: 1px solid rgb(241, 9, 9);
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px; /* Espacio entre los botones y el canvas */
+}
+
+button {
+    background-color: #4CAF50; /* Color de fondo */
+    color: white; /* Color del texto */
+    padding: 10px 20px; /* Espaciado interno */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    margin: 5px; /* Espaciado entre botones */
+    transition: background-color 0.10s; /* Transición suave para el color de fondo */
+}
+
+button:hover {
+    background-color: #12ee1d; /* Color de fondo al pasar el mouse */
+}
+
+#coordinates {
+    position: absolute; /* Posicionamiento absoluto */
+    top: 400px; /* Distancia desde la parte superior */
+    right: 20px; /* Distancia desde la parte derecha */
+    padding: 10px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde */
+    border-radius: 5px; /* Bordes redondeados */
+    background-color: #f9f9f9; /* Color de fondo */
+    max-width: 340px; /* Ancho máximo */
+}
+#coordinates div {
+    margin: 5px 0; /* Espaciado entre las coordenadas */
+    padding: 5px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde */
+    border-radius: 3px; /* Bordes redondeados */
+}
+
+
+-----------------------JAVA 2, tiene el ajuste de que aparezca las coordenadas-------------------
+					en la pagina de HTML
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const rectangles = []; // Array para almacenar las coordenadas de los rectángulos
+const canvasWidth = canvas.width; // Ancho del canvas
+const canvasHeight = canvas.height;
+let startX, startY, isDrawing = false;
+let currentType = ''; // Tipo de rectángulo a dibujar
+let currentRect = null; // Variable para almacenar el rectángulo actual
+
+// Evento para seleccionar el tipo de rectángulo
+document.getElementById('btn1').addEventListener('click', () => { currentType = 'Imagen 1'; });
+document.getElementById('btn2').addEventListener('click', () => { currentType = 'Imagen 2'; });
+document.getElementById('btn3').addEventListener('click', () => { currentType = 'Título'; });
+document.getElementById('btn4').addEventListener('click', () => { currentType = 'Legal'; });
+document.getElementById('btn5').addEventListener('click', () => { currentType = 'Logo'; });
+
+// Evento para iniciar el dibujo
+canvas.addEventListener('mousedown', (event) => {
+    if (currentType) { // Solo dibujar si se ha seleccionado un tipo
+        startX = event.offsetX; // Coordenada X inicial
+        startY = event.offsetY; // Coordenada Y inicial
+        isDrawing = true; // Cambia el estado a "dibujando"
+    }
+});
+
+// Evento para dibujar en el canvas
+canvas.addEventListener('mousemove', (event) => {
+    if (isDrawing) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+        // Redibujar todos los rectángulos existentes
+        rectangles.forEach(rect => {
+            ctx.strokeRect(rect.x * canvasWidth, rect.y * canvasHeight, rect.width * canvasWidth, rect.height * canvasHeight);
+        });
+        const width = event.offsetX - startX; // Calcular el ancho del rectángulo
+        const height = event.offsetY - startY; // Calcular la altura del rectángulo
+        ctx.strokeRect(startX, startY, width, height); // Dibujar el rectángulo actual
+    }
+});
+
+// Evento para finalizar el dibujo
+canvas.addEventListener('mouseup', (event) => {
+    if (isDrawing) {
+        const width = event.offsetX - startX; // Calcular el ancho final
+        const height = event.offsetY - startY; // Calcular la altura final
+        // Almacenar las coordenadas normalizadas en el objeto currentRect
+        currentRect = { 
+            x: startX / canvasWidth, 
+            y: startY / canvasHeight, 
+            width: width / canvasWidth, 
+            height: height / canvasHeight,
+            type: currentType // Guardar el tipo de rectángulo
+        };
+        isDrawing = false; // Cambiar el estado a "no dibujando"
+    }
+});
+
+// Evento para guardar las coordenadas
+document.getElementById('saveButton').addEventListener('click', () => {
+    if (currentRect) {
+        rectangles.push(currentRect); // Agregar el nuevo rectángulo al array
+        displayCoordinates(currentRect); // Mostrar las coordenadas en el div
+        currentRect = null; // Reiniciar currentRect
+    } else {
+        alert('No hay coordenadas para guardar. Dibuja un rectángulo primero.');
+    }
+});
+
+// Función para mostrar las coordenadas en el div
+function displayCoordinates(rect) {
+    const coordinatesDiv = document.getElementById('coordinates');
+    const coordText = `Tipo: ${rect.type}, X: ${rect.x.toFixed(3)}, Y: ${rect.y.toFixed(3)}, Width: ${rect.width.toFixed(3)}, Height: ${rect.height.toFixed(3)}`; // Usar comillas invertidas
+    const coordElement = document.createElement('div');
+    coordElement.textContent = coordText; // Establecer el texto del nuevo div
+    coordinatesDiv.appendChild(coordElement); // Agregar el nuevo div al contenedor de coordenadas
+}
+
+// Evento para descargar las coordenadas
+document.getElementById('descargar').addEventListener('click', () => {
+    if (rectangles.length === 0) {
+        alert('No hay coordenadas guardadas para descargar.');
+        return;
+    }
+    const dataStr = JSON.stringify(rectangles, null, 2); // Convertir las coordenadas a formato JSON
+    const blob = new Blob([dataStr], { type: 'application/json' }); // Crear un blob con el contenido
+    const url = URL.createObjectURL(blob); // Crear una URL para el blob
+    const a = document.createElement('a'); // Crear un elemento <a> para la descarga
+    a.href = url; // Establecer la URL del blob como href
+    a.download = 'coordenadas.json'; // Nombre del archivo a descargar
+    document.body.appendChild(a); // Agregar el elemento al DOM
+    a.click(); // Simular un clic para iniciar la descarga
+    document.body.removeChild(a); // Eliminar el elemento del DOM
+    URL.revokeObjectURL(url); // Liberar la URL del blob
+});
+
+
+--------------------------JAVA 3, este codigo guarda el nombre de los recuadros----------------
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const rectangles = []; // Array para almacenar las coordenadas de los rectángulos
+const canvasWidth = canvas.width; // Ancho del canvas
+const canvasHeight = canvas.height;
+let startX, startY, isDrawing = false;
+let currentType = ''; // Tipo de rectángulo a dibujar
+let currentRect = null; // Variable para almacenar el rectángulo actual
+
+// Evento para seleccionar el tipo de rectángulo
+document.getElementById('btn1').addEventListener('click', () => { currentType = 'Imagen 1'; });
+document.getElementById('btn2').addEventListener('click', () => { currentType = 'Imagen 2'; });
+document.getElementById('btn3').addEventListener('click', () => { currentType = 'Titulo'; });
+document.getElementById('btn4').addEventListener('click', () => { currentType = 'Legal'; });
+document.getElementById('btn5').addEventListener('click', () => { currentType = 'Logo'; });
+
+// Evento para iniciar el dibujo
+canvas.addEventListener('mousedown', (event) => {
+    if (currentType) { // Solo dibujar si se ha seleccionado un tipo
+        startX = event.offsetX; // Coordenada X inicial
+        startY = event.offsetY; // Coordenada Y inicial
+        isDrawing = true; // Cambia el estado a "dibujando"
+    }
+});
+
+// Evento para dibujar en el canvas
+canvas.addEventListener('mousemove', (event) => {
+    if (isDrawing) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+        // Redibujar todos los rectángulos existentes
+        rectangles.forEach(rect => {
+            ctx.strokeRect(rect.x * canvasWidth, rect.y * canvasHeight, rect.width * canvasWidth, rect.height * canvasHeight);
+        });
+        const width = event.offsetX - startX; // Calcular el ancho del rectángulo
+        const height = event.offsetY - startY; // Calcular la altura del rectángulo
+        ctx.strokeRect(startX, startY, width, height); // Dibujar el rectángulo actual
+    }
+});
+
+// Evento para finalizar el dibujo
+canvas.addEventListener('mouseup', (event) => {
+    if (isDrawing) {
+        const width = event.offsetX - startX; // Calcular el ancho final
+        const height = event.offsetY - startY; // Calcular la altura final
+        // Almacenar las coordenadas normalizadas en el objeto currentRect
+        currentRect = { 
+            x: startX / canvasWidth, 
+            y: startY / canvasHeight, 
+            width: width / canvasWidth, 
+            height: height / canvasHeight,
+            type: currentType // Guardar el tipo de rectángulo
+        };
+        isDrawing = false; // Cambiar el estado a "no dibujando"
+    }
+});
+
+// Evento para guardar las coordenadas
+document.getElementById('saveButton').addEventListener('click', () => {
+    if (currentRect) {
+        rectangles.push(currentRect); // Agregar el nuevo rectángulo al array
+        drawRectangleWithText(currentRect); // Dibujar el rectángulo con el texto
+        displayCoordinates(currentRect); // Mostrar las coordenadas en el div
+        currentRect = null; // Reiniciar currentRect
+    } else {
+        alert('No hay coordenadas para guardar. Dibuja un rectángulo primero.');
+    }
+});
+
+// Función para dibujar el rectángulo y el texto
+function drawRectangleWithText(rect) {
+    ctx.strokeRect(rect.x * canvasWidth, rect.y * canvasHeight, rect.width * canvasWidth, rect.height * canvasHeight); // Dibujar el rectángulo
+    ctx.fillStyle = 'black'; // Color del texto
+    ctx.textAlign = 'center'; // Alinear el texto al centro
+    ctx.textBaseline = 'middle'; // Alinear el texto verticalmente al medio
+    ctx.font = '16px Arial'; // Establecer el tamaño y tipo de fuente
+    ctx.fillText(rect.type, 
+        rect.x * canvasWidth + (rect.width * canvasWidth) / 2, 
+        rect.y * canvasHeight + (rect.height * canvasHeight) / 2); // Dibujar el texto en el centro del rectángulo
+}
+
+// Función para mostrar las coordenadas en el div
+function displayCoordinates(rect) {
+    const coordinatesDiv = document.getElementById('coordinates');
+    const coordText = `Tipo: ${rect.type}, X: ${rect.x.toFixed(3)}, Y: ${rect.y.toFixed(3)}, Width: ${rect.width.toFixed(3)}, Height: ${rect.height.toFixed(3)}`; // Usar comillas invertidas
+    const coordElement = document.createElement('div');
+    coordElement.textContent = coordText; // Establecer el texto del nuevo div
+    coordinatesDiv.appendChild(coordElement); // Agregar el nuevo div al contenedor de coordenadas
+}
+
+// Evento para descargar las coordenadas
+document.getElementById('descargar').addEventListener('click', () => {
+    if (rectangles.length === 0) {
+        alert('No hay coordenadas guardadas para descargar.');
+        return;
+    }
+    const dataStr = JSON.stringify(rectangles, null, 2); // Convertir las coordenadas a formato JSON
+    const blob = new Blob([dataStr], { type: 'application/json' }); // Crear un blob con el contenido
+    const url = URL.createObjectURL(blob); // Crear una URL para el blob
+    const a = document.createElement('a'); // Crear un elemento <a> para la descarga
+    a.href = url; // Establecer la URL del blob como href
+    a.download = 'coordenadas.json'; // Nombre del archivo a descargar
+    document.body.appendChild(a); // Agregar el elemento al DOM
+    a.click(); // Simular un clic para iniciar la descarga
+    document.body.removeChild(a); // Eliminar el elemento del DOM
+    URL.revokeObjectURL(url); // Liberar la URL del blob
+});
