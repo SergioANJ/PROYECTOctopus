@@ -39,32 +39,39 @@ variacion_claro = pd.read_excel(r"C:\Users\sergio.jimenez\Documents\octopus\Data
 canal_claro = pd.read_excel(r"C:\Users\sergio.jimenez\Documents\octopus\Data_octopus.xlsx", sheet_name="Dim_canal")
 oferta_claro = pd.read_excel(r"C:\Users\sergio.jimenez\Documents\octopus\Data_octopus.xlsx", sheet_name="Dim_oferta")
 
-#################Tabla_mensajes_SOLODEMO_SOLODEMO
-num_filas = 30 #cantidad de piezas 
+# Agrupar los id_plantilla por resolucion_output
+grupo_resoluciones = plantillas.groupby('resolucion_output')['id_plantilla'].apply(list).to_dict()
 
-################## Generar IDs aleatorios para todas las dimensiones
-# Excluir el id_plantilla 13
-plantillas_excluidas = plantillas[~plantillas['id_plantilla'].isin([13,15])]
-id_plantilla_random = np.random.choice(plantillas_excluidas['id_plantilla'], size=num_filas, replace=True) #False si no queremos que se repitan las Img
-id_back_random = np.random.choice(back['id_back'], size=num_filas, replace=True)
-id_imagen1_random = np.random.choice(imagen1['id_imagen_1'], size=num_filas, replace=True)
-id_imagen2_random = np.random.choice(imagen2['id_imagen_2'], size=num_filas, replace=True)
-id_copys_random = np.random.choice(copys['id_copy'], size=num_filas, replace=True)
-id_legal_random = np.random.choice(legal['id_legal'], size=num_filas, replace=True)
-id_logo_random = np.random.choice(logo['id_logo'], size=num_filas, replace=True)
+# Definir el número de filas (piezas) por resolución
+num_filas = 3  # Cambia este valor según lo que necesites
 
+# Seleccionar id_plantilla para cada resolución, permitiendo repeticiones si es necesario
+id_plantilla_seleccionados = []
+for resolucion, ids in grupo_resoluciones.items():
+    if len(ids) >= num_filas:
+        seleccion = np.random.choice(ids, size=num_filas, replace=False).tolist()
+    else:
+        # Si no hay suficientes, repetir los id_plantilla hasta completar num_filas
+        seleccion = np.random.choice(ids, size=num_filas, replace=True).tolist()
+    id_plantilla_seleccionados.extend(seleccion)
 
+# Filtrar las plantillas seleccionadas
+plantillas_seleccionadas = plantillas[plantillas['id_plantilla'].isin(id_plantilla_seleccionados)]
+
+# Crear la tabla_hechos_random
 tabla_hechos_random = pd.DataFrame({
-    'id_plantilla':id_plantilla_random,
-    'id_back': id_back_random,
-    'id_imagen_1': id_imagen1_random,
-    'id_imagen_2': id_imagen2_random,
-    'id_copy': id_copys_random,
-    'id_legal': id_legal_random,
-    'id_logo': id_logo_random,
+    'id_plantilla': id_plantilla_seleccionados,  # Usar la lista con repeticiones
+    'id_back': np.random.choice(back['id_back'], size=len(id_plantilla_seleccionados), replace=True),
+    'id_imagen_1': np.random.choice(imagen1['id_imagen_1'], size=len(id_plantilla_seleccionados), replace=True),
+    'id_imagen_2': np.random.choice(imagen2['id_imagen_2'], size=len(id_plantilla_seleccionados), replace=True),
+    'id_copy': np.random.choice(copys['id_copy'], size=len(id_plantilla_seleccionados), replace=True),
+    'id_legal': np.random.choice(legal['id_legal'], size=len(id_plantilla_seleccionados), replace=True),
+    'id_logo': np.random.choice(logo['id_logo'], size=len(id_plantilla_seleccionados), replace=True),
 })
 
-tabla_hechos_random['id_mensaje'] = np.arange(1, num_filas + 1)
+# Agregar un id_mensaje único
+tabla_hechos_random['id_mensaje'] = np.arange(1, len(tabla_hechos_random) + 1)
+
 ################# Verificar claves foráneas para cada dimensión
 missing_keys = {}
 
@@ -213,10 +220,18 @@ def resize_and_pad(image_path, target_size, background_color=(255, 255, 255, 0))
 
     return new_image
 
-from PIL import Image, ImageDraw, ImageFont
+
 
 def generate_image(background_path, imagen_path, logo_path, copy_text, copy_position, image_position, logo_position, legal_text, legal_position, button_path, button_position, output_resolution, output_path):
-    from PIL import Image, ImageDraw, ImageFont
+    # Crear la carpeta de salida basada en la resolución
+    output_folder = os.path.join("C:\\Users\\sergio.jimenez\\Documents\\octopus\\response", output_resolution)
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)  # Crear la carpeta si no existe
+
+    # Modificar el output_path para guardar en la carpeta correspondiente
+    output_filename = os.path.basename(output_path)  # Obtener el nombre del archivo
+    output_path = os.path.join(output_folder, output_filename)  # Ruta completa de la carpeta de resolución
+
     ancho, alto = map(int, output_resolution.split('x'))
 
     # Cargar y redimensionar el fondo
@@ -471,9 +486,11 @@ for index, row in df.iterrows():
     button_position = tuple(map(float, plantillas.loc[plantillas['id_plantilla'] == id_plantilla, 'ub_Imagen_2'].values[0].split(',')))
     output_resolution = plantillas.loc[plantillas['id_plantilla'] == id_plantilla, 'resolucion_output']
     output_resolution = output_resolution.values[0] if not output_resolution.empty else "1080x1920"
+    
     formato = row['formato']
     if formato == "imagen":
-        output_path = f'C:\\Users\\sergio.jimenez\\Documents\\octopus\\response\\output_imagen_{index + 1}.png'
+        output_filename = f'output_imagen_{index + 1}.png'
+        output_path = os.path.join("C:\\Users\\sergio.jimenez\\Documents\\octopus\\response", output_resolution, output_filename)
         generate_image(
             background_path, imagen_path, logo_path, copy_text, copy_position,
             image_position, logo_position, legal_text, legal_position,
