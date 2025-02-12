@@ -1,11 +1,21 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const rectangles = []; // Array para almacenar las coordenadas de los rectángulos
-const canvasWidth = canvas.width; // Ancho del canvas
-const canvasHeight = canvas.height;
+let canvasWidth = canvas.width; // Ancho del canvas
+let canvasHeight = canvas.height;
 let startX, startY, isDrawing = false;
 let currentType = ''; // Tipo de rectángulo a dibujar
 let currentRect = null; // Variable para almacenar el rectángulo actual
+
+// Evento para cambiar las dimensiones del canvas
+document.getElementById('aplicarDimensiones').addEventListener('click', () => {
+    const dimensiones = document.getElementById('dimensiones').value.split('x');
+    canvasWidth = parseInt(dimensiones[0]);
+    canvasHeight = parseInt(dimensiones[1]);
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    drawAllRectangles(); // Redibujar los rectángulos con las nuevas dimensiones
+});
 
 // Evento para seleccionar el tipo de rectángulo
 document.getElementById('btn1').addEventListener('click', () => { currentType = 'Imagen 1'; });
@@ -94,7 +104,17 @@ document.getElementById('descargar').addEventListener('click', () => {
         alert('No hay coordenadas guardadas para descargar.');
         return;
     }
-    const dataStr = JSON.stringify(rectangles, null, 2); // Convertir las coordenadas a formato JSON
+
+        // Obtener la resolución seleccionada
+    const dimensiones = document.getElementById('dimensiones').value;
+
+    // Crear un objeto que incluya las coordenadas y la resolución
+    const data = {
+        resolucion: dimensiones, // Agregar la resolución seleccionada
+        rectangulos: rectangles // Incluir las coordenadas de los rectángulos
+    };
+
+    const dataStr = JSON.stringify(data, null, 2); // Convertir las coordenadas a formato JSON
     const blob = new Blob([dataStr], { type: 'application/json' }); // Crear un blob con el contenido
     const url = URL.createObjectURL(blob); // Crear una URL para el blob
     const a = document.createElement('a'); // Crear un elemento <a> para la descarga
@@ -147,6 +167,6 @@ document.querySelectorAll('.button').forEach(button => {
             btn.style.backgroundColor = 'lightgray'; // Color original
         });
         // Cambiar el color del botón seleccionado
-        button.style.backgroundColor = 'darkgray'; // Color oscuro para el botón seleccionado
+        button.style.backgroundColor = '#007bff'; // 
     });
 });
