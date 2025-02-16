@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dibujo de Rectángulos</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Enlazamos el archivo CSS -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="octopuslogo.jpg" alt="Logo" class="logo">
+            <h1>Selecciona la dimensión de la plantilla</h1>
+        </header>
+
+        <main>
+            <div class="menu">
+                <label for="dimensiones">Selecciona las dimensiones:</label>
+                <select id="dimensiones">
+                    <option value="600x200">Banner home: 600x200</option>
+                    <option value="600x350">Pop up: 600x350</option>
+                    <option value="700x192" selected>Cota imox: 700x192</option>
+                    <option value="1080x608">WhatsApp: 1080x608</option>
+                    <option value="1440x720">RCS: 1440x720</option>
+                </select>
+                <button class="button" id="aplicarDimensiones">Aplicar Dimensiones</button>
+            </div>
+
+            <div class="buttons">
+                <h2>Selecciona primero el tipo de imagen a dibujar</h2>
+                <button class="button" id="btn1">Imagen 1</button>
+                <button class="button" id="btn2">Imagen 2</button>
+                <button class="button" id="btn3">Título</button>
+                <button class="button" id="btn4">Legal</button>
+                <button class="button" id="btn5">Logo</button>
+                <button class="button" id="saveButton">Guardar Coordenadas</button>
+                <button class="button" id="descargar">Descargar Coordenadas</button>
+            </div>
+
+            <canvas id="canvas" width="1080" height="608"></canvas>
+
+            <div id="coordinates">
+                <h3>Coordenadas Guardadas:</h3>
+                <div id="coordsList"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Claro Colombia.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
