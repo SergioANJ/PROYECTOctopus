@@ -167,6 +167,6 @@ document.querySelectorAll('.button').forEach(button => {
             btn.style.backgroundColor = 'lightgray'; // Color original
         });
         // Cambiar el color del botón seleccionado
-        button.style.backgroundColor = '#007bff'; // 
+        button.style.backgroundColor = '#ff0000'; // 
     });
 });
